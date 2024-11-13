@@ -1,25 +1,16 @@
-FROM golang:1.23-alpine AS builder
-
-WORKDIR /code
-
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY *.go ./
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o backend
-
-FROM alpine:latest AS runtime
+FROM alpine:3.20
 
 LABEL description="Supotsu no Ochaya - Backend"
 LABEL website="https://supotsu-no-ochaya.github.io/"
 
-WORKDIR /data
-VOLUME /data
+WORKDIR /app
+VOLUME /app/pb_data /app/config /app/log
 
-COPY --from=builder /code/backend /opt/backend
+ARG TARGETARCH
+ARG TARGETOS
+COPY dist/backend-${TARGETOS}-${TARGETARCH} /app/bin/backend
 
-EXPOSE 80
+EXPOSE 8090
 
-ENTRYPOINT ["/opt/backend", "serve"]
-CMD ["--http=0.0.0.0:80"]
+ENTRYPOINT ["/app/bin/backend", "serve"]
+CMD ["--http=0.0.0.0:8090", "--dir=./pb_data"]
