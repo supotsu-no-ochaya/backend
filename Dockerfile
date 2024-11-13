@@ -1,25 +1,20 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:1.23-alpine AS build
 
-WORKDIR /code
+ARG LDL_FLAGS="-s -w"
+WORKDIR /build
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="${LDL_FLAGS}" -o backend ./cmd/app
 
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY *.go ./
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o backend
-
-FROM alpine:latest AS runtime
+FROM alpine:3.20
 
 LABEL description="Supotsu no Ochaya - Backend"
 LABEL website="https://supotsu-no-ochaya.github.io/"
 
-WORKDIR /data
-VOLUME /data
+WORKDIR /app
+VOLUME /app/pb_data /app/config /app/log
+COPY --from=build /build/backend /app/bin/backend
 
-COPY --from=builder /code/backend /opt/backend
+EXPOSE 8090
 
-EXPOSE 80
-
-ENTRYPOINT ["/opt/backend", "serve"]
-CMD ["--http=0.0.0.0:80"]
+ENTRYPOINT ["/app/bin/backend", "serve"]
+CMD ["--http=0.0.0.0:8090", "--dir=./pb_data"]

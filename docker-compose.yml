@@ -1,0 +1,15 @@
+services:
+  supotsu-backend:
+    image: supotsu-backend:local
+    container_name: supotsu-backend
+    ports:
+      - "8090:8090"
+    volumes:
+      - pb-data:/app/pb_data
+      - config:/app/config
+      - log:/app/log
+
+volumes:
+  pb-data:
+  config:
+  log:
