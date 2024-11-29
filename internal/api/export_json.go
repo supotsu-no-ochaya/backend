@@ -168,7 +168,7 @@ func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]inter
 	return orders, nil
 }
 
-// fetchOrders fetches orders within the specified timeframe
+// fetchPayments fetches payments within the specified timeframe
 func fetchPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
 	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
 		"start": startTime,
