@@ -89,18 +89,19 @@
     "schema": [
       {
         "system": false,
-        "id": "jcqnpcrv",
-        "name": "order_item",
-        "type": "relation",
-        "required": true,
+        "id": "9qjaofxy",
+        "name": "type",
+        "type": "select",
+        "required": false,
         "presentable": false,
         "unique": false,
         "options": {
-          "collectionId": "4hacy7mqj13o9nq",
-          "cascadeDelete": false,
-          "minSelect": null,
           "maxSelect": 1,
-          "displayFields": null
+          "values": [
+            "order",
+            "order_item",
+            "payment"
+          ]
         }
       },
       {
