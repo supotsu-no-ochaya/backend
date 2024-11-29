@@ -371,7 +371,7 @@
         "id": "9zpaiuu6",
         "name": "discount_percent",
         "type": "number",
-        "required": true,
+        "required": false,
         "presentable": false,
         "unique": false,
         "options": {
