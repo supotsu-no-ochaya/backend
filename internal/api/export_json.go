@@ -48,8 +48,8 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 		}
 		exportData.Products = products
 
-		// Fetch events within the specified timeframe
-		events, err := fetchEvents(app, startTime, endTime)
+		// Fetch and enrich events within the specified timeframe
+		events, err := fetchAndEnrichEvents(app, startTime, endTime)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
@@ -62,8 +62,8 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 		}
 		exportData.Orders = orders
 
-		// Fetch payments within the specified timeframe
-		payments, err := fetchPayments(app, startTime, endTime)
+		// Fetch and enrich payments within the specified timeframe
+		payments, err := fetchAndEnrichPayments(app, startTime, endTime)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
@@ -124,8 +124,8 @@ func fetchAndEnrichProducts(app core.App) ([]map[string]interface{}, error) {
 	return products, nil
 }
 
-// fetchEvents fetches events within the specified timeframe
-func fetchEvents(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+// fetchAndEnrichEvents fetches events within the specified timeframe and enriches them
+func fetchAndEnrichEvents(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
 	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
 		"start": startTime,
 		"end":   endTime,
@@ -141,7 +141,14 @@ func fetchEvents(app core.App, startTime, endTime time.Time) ([]map[string]inter
 		if err != nil {
 			return nil, err
 		}
-		events = append(events, eventMap)
+
+		// Enrich 'order_item' in event
+		enrichedEventMap, err := enrichEventData(app, eventMap)
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, enrichedEventMap)
 	}
 	return events, nil
 }
@@ -168,8 +175,8 @@ func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]inter
 	return orders, nil
 }
 
-// fetchPayments fetches payments within the specified timeframe
-func fetchPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+// fetchAndEnrichPayments fetches payments within the specified timeframe and enriches them
+func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
 	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
 		"start": startTime,
 		"end":   endTime,
@@ -185,7 +192,14 @@ func fetchPayments(app core.App, startTime, endTime time.Time) ([]map[string]int
 		if err != nil {
 			return nil, err
 		}
-		payments = append(payments, paymentMap)
+
+		// Enrich 'payment_option' in payment
+		enrichedPaymentMap, err := enrichPaymentData(app, paymentMap)
+		if err != nil {
+			return nil, err
+		}
+
+		payments = append(payments, enrichedPaymentMap)
 	}
 	return payments, nil
 }
@@ -274,4 +288,42 @@ func enrichProductData(app core.App, productMap map[string]interface{}) (map[str
 	}
 
 	return productMap, nil
+}
+
+// enrichEventData enriches 'order_item' in event with full details
+func enrichEventData(app core.App, eventMap map[string]interface{}) (map[string]interface{}, error) {
+	dao := app.Dao()
+
+	// Enrich 'order_item'
+	if orderItemID, ok := eventMap["order_item"].(string); ok {
+		orderItemRecord, err := dao.FindRecordById("order_item", orderItemID)
+		if err == nil {
+			orderItemMap, err := getCleanRecordMap(orderItemRecord)
+			if err != nil {
+				return nil, err
+			}
+			eventMap["order_item"] = orderItemMap
+		}
+	}
+
+	return eventMap, nil
+}
+
+// enrichPaymentData enriches 'payment_option' in payment with full details
+func enrichPaymentData(app core.App, paymentMap map[string]interface{}) (map[string]interface{}, error) {
+	dao := app.Dao()
+
+	// Enrich 'payment_option'
+	if paymentOptionID, ok := paymentMap["payment_option"].(string); ok {
+		paymentOptionRecord, err := dao.FindRecordById("payment_option", paymentOptionID)
+		if err == nil {
+			paymentOptionMap, err := getCleanRecordMap(paymentOptionRecord)
+			if err != nil {
+				return nil, err
+			}
+			paymentMap["payment_option"] = paymentOptionMap
+		}
+	}
+
+	return paymentMap, nil
 }
