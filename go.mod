@@ -1,4 +1,4 @@
-module main
+module github.com/supotsu-no-ochaya/backend
 
 go 1.23.2
 
