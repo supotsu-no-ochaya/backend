@@ -16,6 +16,7 @@ type ExportData struct {
 	Products []map[string]interface{} `json:"products"`
 	Events   []map[string]interface{} `json:"events"`
 	Orders   []map[string]interface{} `json:"orders"`
+	Payments []map[string]interface{} `json:"payments"`
 }
 
 type FilterData struct {
@@ -60,6 +61,13 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Orders = orders
+
+		// Fetch payments within the specified timeframe
+		payments, err := fetchPayments(app, startTime, endTime)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		exportData.Payments = payments
 
 		// Serialize the export data to JSON with indentation for readability
 		return sendJSONResponse(c, exportData)
@@ -144,13 +152,13 @@ func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]inter
 		"start": startTime,
 		"end":   endTime,
 	})
-	eventRecords, err := app.Dao().FindRecordsByExpr("order", expr)
+	orderRecords, err := app.Dao().FindRecordsByExpr("order", expr)
 	if err != nil {
 		return nil, err
 	}
 
-	orders := make([]map[string]interface{}, 0, len(eventRecords))
-	for _, record := range eventRecords {
+	orders := make([]map[string]interface{}, 0, len(orderRecords))
+	for _, record := range orderRecords {
 		orderMap, err := getCleanRecordMap(record)
 		if err != nil {
 			return nil, err
@@ -158,6 +166,28 @@ func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]inter
 		orders = append(orders, orderMap)
 	}
 	return orders, nil
+}
+
+// fetchOrders fetches orders within the specified timeframe
+func fetchPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+		"start": startTime,
+		"end":   endTime,
+	})
+	paymentRecords, err := app.Dao().FindRecordsByExpr("payment", expr)
+	if err != nil {
+		return nil, err
+	}
+
+	payments := make([]map[string]interface{}, 0, len(paymentRecords))
+	for _, record := range paymentRecords {
+		paymentMap, err := getCleanRecordMap(record)
+		if err != nil {
+			return nil, err
+		}
+		payments = append(payments, paymentMap)
+	}
+	return payments, nil
 }
 
 // sendJSONResponse sends the JSON response as a downloadable file
