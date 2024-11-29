@@ -14,9 +14,9 @@ import (
 type ExportData struct {
 	Filter   FilterData               `json:"filter"`
 	Products []map[string]interface{} `json:"products"`
-	Events   []map[string]interface{} `json:"events"`
 	Orders   []map[string]interface{} `json:"orders"`
 	Payments []map[string]interface{} `json:"payments"`
+	// Removed the Events field
 }
 
 type FilterData struct {
@@ -48,26 +48,25 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 		}
 		exportData.Products = products
 
-		// Fetch and enrich events within the specified timeframe
-		events, err := fetchAndEnrichEvents(app, startTime, endTime)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
-		}
-		exportData.Events = events
-
-		// Fetch orders within the specified timeframe
-		orders, err := fetchOrders(app, startTime, endTime)
+		// Fetch orders with order_items and build maps
+		orders, ordersMap, orderItemsMap, err := fetchOrdersWithItems(app, startTime, endTime)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Orders = orders
 
-		// Fetch and enrich payments within the specified timeframe
-		payments, err := fetchAndEnrichPayments(app, startTime, endTime)
+		// Fetch payments and build paymentsMap
+		payments, paymentsMap, err := fetchAndEnrichPayments(app, startTime, endTime)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Payments = payments
+
+		// Fetch events and assign them to the appropriate objects
+		err = processEventsAndAssign(app, startTime, endTime, ordersMap, orderItemsMap, paymentsMap)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
 
 		// Serialize the export data to JSON with indentation for readability
 		return sendJSONResponse(c, exportData)
@@ -124,84 +123,174 @@ func fetchAndEnrichProducts(app core.App) ([]map[string]interface{}, error) {
 	return products, nil
 }
 
-// fetchAndEnrichEvents fetches events within the specified timeframe and enriches them
-func fetchAndEnrichEvents(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
-	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
-		"start": startTime,
-		"end":   endTime,
-	})
-	eventRecords, err := app.Dao().FindRecordsByExpr("event", expr)
-	if err != nil {
-		return nil, err
+func stringSliceToInterfaceSlice(strings []string) []interface{} {
+	interfaces := make([]interface{}, len(strings))
+	for i, v := range strings {
+		interfaces[i] = v
 	}
-
-	events := make([]map[string]interface{}, 0, len(eventRecords))
-	for _, record := range eventRecords {
-		eventMap, err := getCleanRecordMap(record)
-		if err != nil {
-			return nil, err
-		}
-
-		// Enrich 'order_item' in event
-		enrichedEventMap, err := enrichEventData(app, eventMap)
-		if err != nil {
-			return nil, err
-		}
-
-		events = append(events, enrichedEventMap)
-	}
-	return events, nil
+	return interfaces
 }
 
-// fetchOrders fetches orders within the specified timeframe
-func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+// fetchOrdersWithItems fetches orders and their associated order_items
+func fetchOrdersWithItems(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, map[string]map[string]interface{}, map[string]map[string]interface{}, error) {
 	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
 		"start": startTime,
 		"end":   endTime,
 	})
 	orderRecords, err := app.Dao().FindRecordsByExpr("order", expr)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	orders := make([]map[string]interface{}, 0, len(orderRecords))
+	ordersMap := make(map[string]map[string]interface{})
+
+	// Collect order IDs
+	orderIDs := make([]string, len(orderRecords))
+	for i, record := range orderRecords {
+		orderIDs[i] = record.Id
+	}
+
+	// Convert orderIDs to []interface{}
+	orderIDsInterface := stringSliceToInterfaceSlice(orderIDs)
+
+	// Fetch order_items associated with the orders
+	orderItemExpr := dbx.In("order", orderIDsInterface...)
+	orderItemRecords, err := app.Dao().FindRecordsByExpr("order_item", orderItemExpr)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	// Create maps for easy lookup
+	orderItemsByOrderID := make(map[string][]map[string]interface{})
+	orderItemsMap := make(map[string]map[string]interface{})
+
+	for _, record := range orderItemRecords {
+		orderItemMap, err := getCleanRecordMap(record)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		orderItemID := record.Id
+		orderItemsMap[orderItemID] = orderItemMap
+
+		orderID := record.GetString("order")
+		orderItemsByOrderID[orderID] = append(orderItemsByOrderID[orderID], orderItemMap)
+	}
+
+	// Attach order_items to orders
 	for _, record := range orderRecords {
 		orderMap, err := getCleanRecordMap(record)
 		if err != nil {
-			return nil, err
+			return nil, nil, nil, err
 		}
+
+		orderID := record.Id
+		if items, ok := orderItemsByOrderID[orderID]; ok {
+			orderMap["order_items"] = items
+		} else {
+			orderMap["order_items"] = []map[string]interface{}{}
+		}
+
 		orders = append(orders, orderMap)
+		ordersMap[orderID] = orderMap
 	}
-	return orders, nil
+
+	return orders, ordersMap, orderItemsMap, nil
 }
 
-// fetchAndEnrichPayments fetches payments within the specified timeframe and enriches them
-func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+// fetchAndEnrichPayments fetches payments and enriches them with related data
+func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, map[string]map[string]interface{}, error) {
 	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
 		"start": startTime,
 		"end":   endTime,
 	})
 	paymentRecords, err := app.Dao().FindRecordsByExpr("payment", expr)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	payments := make([]map[string]interface{}, 0, len(paymentRecords))
+	paymentsMap := make(map[string]map[string]interface{})
+
 	for _, record := range paymentRecords {
 		paymentMap, err := getCleanRecordMap(record)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		// Enrich 'payment_option' in payment
 		enrichedPaymentMap, err := enrichPaymentData(app, paymentMap)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		payments = append(payments, enrichedPaymentMap)
+		paymentsMap[record.Id] = enrichedPaymentMap
 	}
-	return payments, nil
+	return payments, paymentsMap, nil
+}
+
+// processEventsAndAssign processes events and assigns them to orders, order_items, or payments
+func processEventsAndAssign(app core.App, startTime, endTime time.Time, ordersMap, orderItemsMap, paymentsMap map[string]map[string]interface{}) error {
+	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+		"start": startTime,
+		"end":   endTime,
+	})
+	eventRecords, err := app.Dao().FindRecordsByExpr("event", expr)
+	if err != nil {
+		return err
+	}
+
+	for _, record := range eventRecords {
+		eventMap, err := getCleanRecordMap(record)
+		if err != nil {
+			return err
+		}
+
+		// Get 'type' and 'content' from event
+		eventType, _ := eventMap["type"].(string)
+		contentRaw, _ := eventMap["content"]
+		content, _ := contentRaw.(map[string]interface{})
+
+		if content == nil {
+			continue // Skip events without content
+		}
+
+		switch eventType {
+		case "order_item":
+			orderItemID, _ := content["order_item_id"].(string)
+			if orderItem, ok := orderItemsMap[orderItemID]; ok {
+				// Append event to orderItem["events"]
+				appendEvent(orderItem, eventMap)
+			}
+		case "order":
+			orderID, _ := content["order_id"].(string)
+			if order, ok := ordersMap[orderID]; ok {
+				// Append event to order["events"]
+				appendEvent(order, eventMap)
+			}
+		case "payment":
+			paymentID, _ := content["payment_id"].(string)
+			if payment, ok := paymentsMap[paymentID]; ok {
+				// Append event to payment["events"]
+				appendEvent(payment, eventMap)
+			}
+		default:
+			// Unknown type, ignore or handle as needed
+		}
+	}
+
+	return nil
+}
+
+// appendEvent appends an event to the 'events' slice of the object
+func appendEvent(obj map[string]interface{}, eventMap map[string]interface{}) {
+	events, ok := obj["events"].([]interface{})
+	if !ok {
+		events = []interface{}{}
+	}
+	events = append(events, eventMap)
+	obj["events"] = events
 }
 
 // sendJSONResponse sends the JSON response as a downloadable file
@@ -288,25 +377,6 @@ func enrichProductData(app core.App, productMap map[string]interface{}) (map[str
 	}
 
 	return productMap, nil
-}
-
-// enrichEventData enriches 'order_item' in event with full details
-func enrichEventData(app core.App, eventMap map[string]interface{}) (map[string]interface{}, error) {
-	dao := app.Dao()
-
-	// Enrich 'order_item'
-	if orderItemID, ok := eventMap["order_item"].(string); ok {
-		orderItemRecord, err := dao.FindRecordById("order_item", orderItemID)
-		if err == nil {
-			orderItemMap, err := getCleanRecordMap(orderItemRecord)
-			if err != nil {
-				return nil, err
-			}
-			eventMap["order_item"] = orderItemMap
-		}
-	}
-
-	return eventMap, nil
 }
 
 // enrichPaymentData enriches 'payment_option' in payment with full details
