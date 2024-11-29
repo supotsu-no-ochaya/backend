@@ -15,6 +15,7 @@ type ExportData struct {
 	Filter   FilterData               `json:"filter"`
 	Products []map[string]interface{} `json:"products"`
 	Events   []map[string]interface{} `json:"events"`
+	Orders   []map[string]interface{} `json:"orders"`
 }
 
 type FilterData struct {
@@ -52,6 +53,13 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Events = events
+
+		// Fetch orders within the specified timeframe
+		orders, err := fetchOrders(app, startTime, endTime)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		exportData.Orders = orders
 
 		// Serialize the export data to JSON with indentation for readability
 		return sendJSONResponse(c, exportData)
@@ -114,7 +122,7 @@ func fetchEvents(app core.App, startTime, endTime time.Time) ([]map[string]inter
 		"start": startTime,
 		"end":   endTime,
 	})
-	eventRecords, err := app.Dao().FindRecordsByExpr("events", expr)
+	eventRecords, err := app.Dao().FindRecordsByExpr("event", expr)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +136,28 @@ func fetchEvents(app core.App, startTime, endTime time.Time) ([]map[string]inter
 		events = append(events, eventMap)
 	}
 	return events, nil
+}
+
+// fetchOrders fetches orders within the specified timeframe
+func fetchOrders(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, error) {
+	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+		"start": startTime,
+		"end":   endTime,
+	})
+	eventRecords, err := app.Dao().FindRecordsByExpr("order", expr)
+	if err != nil {
+		return nil, err
+	}
+
+	orders := make([]map[string]interface{}, 0, len(eventRecords))
+	for _, record := range eventRecords {
+		orderMap, err := getCleanRecordMap(record)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, orderMap)
+	}
+	return orders, nil
 }
 
 // sendJSONResponse sends the JSON response as a downloadable file
