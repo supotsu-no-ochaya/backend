@@ -5,17 +5,15 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
-
 	"github.com/supotsu-no-ochaya/backend/internal/routes"
 )
 
 func main() {
 	app := pocketbase.New()
 
-	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		// Initialize routes
+	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
 		routes.RegisterAPIRoutes(e, app)
-		return nil
+		return e.Next()
 	})
 
 	if err := app.Start(); err != nil {

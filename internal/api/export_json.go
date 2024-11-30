@@ -2,13 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/models"
 )
 
 type ExportData struct {
@@ -16,7 +16,6 @@ type ExportData struct {
 	Products []map[string]interface{} `json:"products"`
 	Orders   []map[string]interface{} `json:"orders"`
 	Payments []map[string]interface{} `json:"payments"`
-	// Removed the Events field
 }
 
 type FilterData struct {
@@ -25,12 +24,12 @@ type FilterData struct {
 }
 
 // ExportJSONHandler returns an Echo handler function that exports JSON based on start and end datetime
-func ExportJSONHandler(app core.App) echo.HandlerFunc {
-	return func(c echo.Context) error {
+func ExportJSONHandler(app core.App) func(e *core.RequestEvent) error {
+	return func(e *core.RequestEvent) error {
 		// Parse and validate query parameters
-		startTime, endTime, err := parseQueryParams(c)
+		startTime, endTime, err := parseQueryParams(e)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+			return e.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 		}
 
 		// Initialize the export data
@@ -44,56 +43,56 @@ func ExportJSONHandler(app core.App) echo.HandlerFunc {
 		// Fetch and enrich products
 		products, err := fetchAndEnrichProducts(app)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Products = products
 
 		// Fetch orders with order_items and build maps
 		orders, ordersMap, orderItemsMap, err := fetchOrdersWithItems(app, startTime, endTime)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Orders = orders
 
 		// Fetch payments and build paymentsMap
 		payments, paymentsMap, err := fetchAndEnrichPayments(app, startTime, endTime)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Payments = payments
 
 		// Fetch events and assign them to the appropriate objects
 		err = processEventsAndAssign(app, startTime, endTime, ordersMap, orderItemsMap, paymentsMap)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 
 		// Serialize the export data to JSON with indentation for readability
-		return sendJSONResponse(c, exportData)
+		return sendJSONResponse(e, exportData)
 	}
 }
 
 // parseQueryParams parses and validates 'start' and 'end' query parameters
-func parseQueryParams(c echo.Context) (time.Time, time.Time, error) {
-	startStr := c.QueryParam("start")
-	endStr := c.QueryParam("end")
+func parseQueryParams(e *core.RequestEvent) (time.Time, time.Time, error) {
+	startStr := e.Request.URL.Query().Get("start")
+	endStr := e.Request.URL.Query().Get("end")
 
 	if startStr == "" || endStr == "" {
-		return time.Time{}, time.Time{}, echo.NewHTTPError(http.StatusBadRequest, "Missing 'start' or 'end' query parameters")
+		return time.Time{}, time.Time{}, fmt.Errorf("Missing 'start' or 'end' query parameters")
 	}
 
 	startTime, err := time.Parse(time.RFC3339, startStr)
 	if err != nil {
-		return time.Time{}, time.Time{}, echo.NewHTTPError(http.StatusBadRequest, "Invalid 'start' datetime format. Use RFC3339 format.")
+		return time.Time{}, time.Time{}, fmt.Errorf("Invalid 'start' datetime format. Use RFC3339 format.")
 	}
 
 	endTime, err := time.Parse(time.RFC3339, endStr)
 	if err != nil {
-		return time.Time{}, time.Time{}, echo.NewHTTPError(http.StatusBadRequest, "Invalid 'end' datetime format. Use RFC3339 format.")
+		return time.Time{}, time.Time{}, fmt.Errorf("Invalid 'end' datetime format. Use RFC3339 format.")
 	}
 
 	if startTime.After(endTime) {
-		return time.Time{}, time.Time{}, echo.NewHTTPError(http.StatusBadRequest, "'start' datetime must be before 'end' datetime")
+		return time.Time{}, time.Time{}, fmt.Errorf("'start' datetime must be before 'end' datetime")
 	}
 
 	return startTime, endTime, nil
@@ -101,7 +100,7 @@ func parseQueryParams(c echo.Context) (time.Time, time.Time, error) {
 
 // fetchAndEnrichProducts fetches all products and enriches them with related data
 func fetchAndEnrichProducts(app core.App) ([]map[string]interface{}, error) {
-	productRecords, err := app.Dao().FindRecordsByExpr("product", nil)
+	productRecords, err := app.FindAllRecords("product")
 	if err != nil {
 		return nil, err
 	}
@@ -133,11 +132,12 @@ func stringSliceToInterfaceSlice(strings []string) []interface{} {
 
 // fetchOrdersWithItems fetches orders and their associated order_items
 func fetchOrdersWithItems(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, map[string]map[string]interface{}, map[string]map[string]interface{}, error) {
-	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+	filter := "created >= {:start} && created <= {:end}"
+	params := dbx.Params{
 		"start": startTime,
 		"end":   endTime,
-	})
-	orderRecords, err := app.Dao().FindRecordsByExpr("order", expr)
+	}
+	orderRecords, err := app.FindRecordsByFilter("order", filter, "", 0, 0, params)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -155,8 +155,7 @@ func fetchOrdersWithItems(app core.App, startTime, endTime time.Time) ([]map[str
 	orderIDsInterface := stringSliceToInterfaceSlice(orderIDs)
 
 	// Fetch order_items associated with the orders
-	orderItemExpr := dbx.In("order", orderIDsInterface...)
-	orderItemRecords, err := app.Dao().FindRecordsByExpr("order_item", orderItemExpr)
+	orderItemRecords, err := app.FindAllRecords("order_item", dbx.In("order", orderIDsInterface...))
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -200,11 +199,12 @@ func fetchOrdersWithItems(app core.App, startTime, endTime time.Time) ([]map[str
 
 // fetchAndEnrichPayments fetches payments and enriches them with related data
 func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[string]interface{}, map[string]map[string]interface{}, error) {
-	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+	filter := "created >= {:start} && created <= {:end}"
+	params := dbx.Params{
 		"start": startTime,
 		"end":   endTime,
-	})
-	paymentRecords, err := app.Dao().FindRecordsByExpr("payment", expr)
+	}
+	paymentRecords, err := app.FindRecordsByFilter("payment", filter, "", 0, 0, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -232,11 +232,12 @@ func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[s
 
 // processEventsAndAssign processes events and assigns them to orders, order_items, or payments
 func processEventsAndAssign(app core.App, startTime, endTime time.Time, ordersMap, orderItemsMap, paymentsMap map[string]map[string]interface{}) error {
-	expr := dbx.NewExp("created BETWEEN {:start} AND {:end}", dbx.Params{
+	filter := "created >= {:start} && created <= {:end}"
+	params := dbx.Params{
 		"start": startTime,
 		"end":   endTime,
-	})
-	eventRecords, err := app.Dao().FindRecordsByExpr("event", expr)
+	}
+	eventRecords, err := app.FindRecordsByFilter("event", filter, "", 0, 0, params)
 	if err != nil {
 		return err
 	}
@@ -294,20 +295,19 @@ func appendEvent(obj map[string]interface{}, eventMap map[string]interface{}) {
 }
 
 // sendJSONResponse sends the JSON response as a downloadable file
-func sendJSONResponse(c echo.Context, data ExportData) error {
+func sendJSONResponse(e *core.RequestEvent, data ExportData) error {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to serialize export data to JSON")
+		return e.InternalServerError("Failed to serialize export data to JSON", err)
 	}
 
-	c.Response().Header().Set("Content-Type", "application/json")
-	c.Response().Header().Set("Content-Disposition", `attachment; filename="export.json"`)
+	e.Response.Header().Set("Content-Disposition", `attachment; filename="export.json"`)
 
-	return c.Blob(http.StatusOK, "application/json", jsonData)
+	return e.Blob(http.StatusOK, "application/json", jsonData)
 }
 
 // getCleanRecordMap converts a Record to a clean map without collection metadata
-func getCleanRecordMap(record *models.Record) (map[string]interface{}, error) {
+func getCleanRecordMap(record *core.Record) (map[string]interface{}, error) {
 	var recordMap map[string]interface{}
 
 	// Marshal the record to JSON
@@ -334,13 +334,11 @@ func cleanRecordMap(recordMap map[string]interface{}) map[string]interface{} {
 
 // enrichProductData adds detailed information for attributes, station, and category
 func enrichProductData(app core.App, productMap map[string]interface{}) (map[string]interface{}, error) {
-	dao := app.Dao()
-
 	// Enrich Attribute
 	if attributes, ok := productMap["attribute"].([]interface{}); ok && len(attributes) > 0 {
 		enrichedAttributes := make([]map[string]interface{}, 0, len(attributes))
 		for _, attrID := range attributes {
-			attrRecord, err := dao.FindRecordById("product_attribute", attrID.(string))
+			attrRecord, err := app.FindRecordById("product_attribute", attrID.(string))
 			if err == nil {
 				attrMap, err := getCleanRecordMap(attrRecord)
 				if err != nil {
@@ -354,7 +352,7 @@ func enrichProductData(app core.App, productMap map[string]interface{}) (map[str
 
 	// Enrich Category
 	if categoryID, ok := productMap["category"].(string); ok {
-		categoryRecord, err := dao.FindRecordById("product_categ", categoryID)
+		categoryRecord, err := app.FindRecordById("product_categ", categoryID)
 		if err == nil {
 			categoryMap, err := getCleanRecordMap(categoryRecord)
 			if err != nil {
@@ -366,7 +364,7 @@ func enrichProductData(app core.App, productMap map[string]interface{}) (map[str
 
 	// Enrich Station
 	if stationID, ok := productMap["station"].(string); ok {
-		stationRecord, err := dao.FindRecordById("station", stationID)
+		stationRecord, err := app.FindRecordById("station", stationID)
 		if err == nil {
 			stationMap, err := getCleanRecordMap(stationRecord)
 			if err != nil {
@@ -381,11 +379,9 @@ func enrichProductData(app core.App, productMap map[string]interface{}) (map[str
 
 // enrichPaymentData enriches 'payment_option' in payment with full details
 func enrichPaymentData(app core.App, paymentMap map[string]interface{}) (map[string]interface{}, error) {
-	dao := app.Dao()
-
 	// Enrich 'payment_option'
 	if paymentOptionID, ok := paymentMap["payment_option"].(string); ok {
-		paymentOptionRecord, err := dao.FindRecordById("payment_option", paymentOptionID)
+		paymentOptionRecord, err := app.FindRecordById("payment_option", paymentOptionID)
 		if err == nil {
 			paymentOptionMap, err := getCleanRecordMap(paymentOptionRecord)
 			if err != nil {
