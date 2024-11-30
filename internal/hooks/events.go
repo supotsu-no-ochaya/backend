@@ -9,7 +9,7 @@ const (
 	eventTableName string = "event"
 )
 
-type event[T eventContent] struct {
+type event[T eventMapping] struct {
 	eventType eventType
 	content   T
 }
@@ -21,8 +21,9 @@ const (
 	orderItemEventType = eventType(orderItemTableName)
 )
 
-type eventContent interface {
-	orderItemEvent | orderEvent
+// Define the mapping between eventType and eventContent
+type eventMapping interface {
+	getEventType() eventType
 }
 
 type orderEvent struct {
@@ -30,26 +31,24 @@ type orderEvent struct {
 	Status  orderStatus `json:"status"`   // JSON key will be "status"
 }
 
+// Associate `orderEvent` with `orderEventType`
+func (orderEvent) getEventType() eventType {
+	return orderEventType
+}
+
 type orderItemEvent struct {
 	OrderItemId string          `json:"order_item_id"` // JSON key will be "order_item_id"
 	Status      orderItemStatus `json:"status"`        // JSON key will be "status"
 }
 
-func constructEvent[T eventContent](content T) event[T] {
-	var eventType eventType
+// Associate `orderItemEvent` with `orderItemEventType`
+func (orderItemEvent) getEventType() eventType {
+	return orderItemEventType
+}
 
-	// Determine the eventType based on the type of content
-	switch any(content).(type) {
-	case orderItemEvent:
-		eventType = orderItemEventType
-	case orderEvent:
-		eventType = orderEventType
-	default:
-		panic("Unsupported event content type")
-	}
-
+func constructEvent[T eventMapping](content T) event[T] {
 	return event[T]{
-		eventType: eventType,
+		eventType: content.getEventType(),
 		content:   content,
 	}
 }
