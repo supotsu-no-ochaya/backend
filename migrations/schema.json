@@ -82,26 +82,14 @@
     "options": {}
   },
   {
-    "id": "i1lcixnuvt2kbct",
-    "name": "bom_template",
+    "id": "sl1s3whql6sim9w",
+    "name": "event",
     "type": "base",
     "system": false,
     "schema": [
       {
         "system": false,
-        "id": "er7efk9m",
-        "name": "template",
-        "type": "json",
-        "required": true,
-        "presentable": false,
-        "unique": false,
-        "options": {
-          "maxSize": 2000000
-        }
-      },
-      {
-        "system": false,
-        "id": "mn0zi13r",
+        "id": "9qjaofxy",
         "name": "type",
         "type": "select",
         "required": false,
@@ -110,40 +98,10 @@
         "options": {
           "maxSelect": 1,
           "values": [
-            "fixed",
-            "selectable"
+            "order",
+            "order_item",
+            "payment"
           ]
-        }
-      }
-    ],
-    "indexes": [],
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
-    "options": {}
-  },
-  {
-    "id": "sl1s3whql6sim9w",
-    "name": "events",
-    "type": "base",
-    "system": false,
-    "schema": [
-      {
-        "system": false,
-        "id": "jcqnpcrv",
-        "name": "order_item",
-        "type": "relation",
-        "required": true,
-        "presentable": false,
-        "unique": false,
-        "options": {
-          "collectionId": "4hacy7mqj13o9nq",
-          "cascadeDelete": false,
-          "minSelect": null,
-          "maxSelect": 1,
-          "displayFields": null
         }
       },
       {
@@ -414,7 +372,7 @@
         "id": "9zpaiuu6",
         "name": "discount_percent",
         "type": "number",
-        "required": true,
+        "required": false,
         "presentable": false,
         "unique": false,
         "options": {
@@ -568,16 +526,6 @@
           "maxSelect": null,
           "displayFields": null
         }
-      },
-      {
-        "system": false,
-        "id": "q2q43jfi",
-        "name": "has_milk_option",
-        "type": "bool",
-        "required": false,
-        "presentable": false,
-        "unique": false,
-        "options": {}
       }
     ],
     "indexes": [],
@@ -677,7 +625,7 @@
   },
   {
     "id": "t1eu98fwy68rm2s",
-    "name": "user_roles",
+    "name": "user_role",
     "type": "base",
     "system": false,
     "schema": [
