@@ -56,7 +56,7 @@ func handleOrderItemStatusUpdate(orderItemRecordEvent *core.RecordEvent) error {
 	}
 
 	// find the "order" the updated "order item" belongs to
-	// if all "order items" attached to that order are now in Status "abholbereit, set the "order" Status to "abholbereit"
+	// if all "order items" attached to that order are now in Status "inArbeit, set the "order" Status to "inArbeit"
 	if orderItemStatus(orderItemRecordEvent.Record.GetString("status")) == orderItemStatusInArbeit {
 		orderID := orderItemRecordEvent.Record.GetString("order")
 		orderItems, err := orderItemRecordEvent.App.FindRecordsByFilter(
