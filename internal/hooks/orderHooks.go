@@ -27,7 +27,7 @@ func RegisterOrderHooks(app *pocketbase.PocketBase) {
 func orderAfterCreateSuccess(orderRecordEvent *core.RecordEvent) error {
 	orderEvent := orderEvent{
 		OrderId: orderRecordEvent.Record.Get("id").(string),
-		Status:  orderRecordEvent.Record.Get("status").(orderStatus),
+		Status:  orderStatus(orderRecordEvent.Record.Get("status").(string)),
 	}
 	return constructEvent(orderEvent).save(orderRecordEvent.App)
 }
@@ -40,7 +40,7 @@ func orderAfterUpdateSuccess(orderRecordEvent *core.RecordEvent) error {
 	if oldStatus != newStatus {
 		orderEvent := orderEvent{
 			OrderId: orderRecordEvent.Record.Get("id").(string),
-			Status:  orderRecordEvent.Record.Get("status").(orderStatus),
+			Status:  newStatus,
 		}
 		// Create an event record for the order item Status change.
 		if err := constructEvent(orderEvent).save(orderRecordEvent.App); err != nil {
