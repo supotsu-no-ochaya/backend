@@ -24,26 +24,26 @@ func RegisterOrderHooks(app *pocketbase.PocketBase) {
 	app.OnRecordAfterUpdateSuccess(orderItemTableName).BindFunc(orderAfterUpdateSuccess)
 }
 
-func orderAfterCreateSuccess(e *core.RecordEvent) error {
+func orderAfterCreateSuccess(orderRecordEvent *core.RecordEvent) error {
 	orderEvent := orderEvent{
-		OrderId: e.Record.Get("id").(string),
-		Status:  e.Record.Get("Status").(orderStatus),
+		OrderId: orderRecordEvent.Record.Get("id").(string),
+		Status:  orderRecordEvent.Record.Get("Status").(orderStatus),
 	}
-	return constructEvent(orderEvent).save(e.App)
+	return constructEvent(orderEvent).save(orderRecordEvent.App)
 }
 
-func orderAfterUpdateSuccess(e *core.RecordEvent) error {
-	oldStatus := orderStatus(e.Record.Original().GetString("Status"))
-	newStatus := orderStatus(e.Record.GetString("Status"))
+func orderAfterUpdateSuccess(orderRecordEvent *core.RecordEvent) error {
+	oldStatus := orderStatus(orderRecordEvent.Record.Original().GetString("Status"))
+	newStatus := orderStatus(orderRecordEvent.Record.GetString("Status"))
 
 	// If Status hasn't changed, no action is needed.
 	if oldStatus != newStatus {
 		orderEvent := orderEvent{
-			OrderId: e.Record.Get("id").(string),
-			Status:  e.Record.Get("Status").(orderStatus),
+			OrderId: orderRecordEvent.Record.Get("id").(string),
+			Status:  orderRecordEvent.Record.Get("Status").(orderStatus),
 		}
 		// Create an event record for the order item Status change.
-		if err := constructEvent(orderEvent).save(e.App); err != nil {
+		if err := constructEvent(orderEvent).save(orderRecordEvent.App); err != nil {
 			return err
 		}
 	}
