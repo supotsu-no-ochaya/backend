@@ -1056,9 +1056,9 @@
         "system": false,
         "type": "select",
         "values": [
-          "aufgegeben",
-          "in arbeit",
-          "bezahlt"
+          "Aufgegeben",
+          "InArbeit",
+          "Bezahlt"
         ]
       },
       {
@@ -1154,10 +1154,10 @@
         "system": false,
         "type": "select",
         "values": [
-          "aufgegeben",
-          "in arbeit",
-          "abholbereit",
-          "geliefert"
+          "Aufgebeben",
+          "InArbeit",
+          "Abholbereit",
+          "Geliefert"
         ]
       },
       {
