@@ -22,5 +22,5 @@ down:
 
 .PHONY: clean
 clean:
-	@docker volume rm $(CURRENT_DIR)_log $(CURRENT_DIR)_config $(CURRENT_DIR)_pb-data
+	@docker volume rm $(CURRENT_DIR)_config $(CURRENT_DIR)_pb-data
 	@rm -rf dist

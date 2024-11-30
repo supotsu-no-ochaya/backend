@@ -17,7 +17,8 @@ func main() {
 		return e.Next()
 	})
 
-	hooks.RegisterHooks(app)
+	hooks.RegisterOrderHooks(app)
+	hooks.RegisterOrderItemHooks(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

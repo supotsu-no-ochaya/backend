@@ -7,9 +7,7 @@ services:
     volumes:
       - pb-data:/app/pb_data
       - config:/app/config
-      - log:/app/log
 
 volumes:
   pb-data:
   config:
-  log:
