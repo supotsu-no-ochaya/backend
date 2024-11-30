@@ -1058,6 +1058,8 @@
         "values": [
           "Aufgegeben",
           "InArbeit",
+          "Abholbereit",
+          "Geliefert",
           "Bezahlt"
         ]
       },
@@ -1154,7 +1156,7 @@
         "system": false,
         "type": "select",
         "values": [
-          "Aufgebeben",
+          "Aufgegeben",
           "InArbeit",
           "Abholbereit",
           "Geliefert"
