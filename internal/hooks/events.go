@@ -31,14 +31,14 @@ type orderEvent struct {
 	Status  orderStatus `json:"status"`   // JSON key will be "status"
 }
 
-// Associate `orderEvent` with `orderEventType`
-func (orderEvent) getEventType() eventType {
-	return orderEventType
-}
-
 type orderItemEvent struct {
 	OrderItemId string          `json:"order_item_id"` // JSON key will be "order_item_id"
 	Status      orderItemStatus `json:"status"`        // JSON key will be "status"
+}
+
+// Associate `orderEvent` with `orderEventType`
+func (orderEvent) getEventType() eventType {
+	return orderEventType
 }
 
 // Associate `orderItemEvent` with `orderItemEventType`
