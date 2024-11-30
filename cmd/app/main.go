@@ -5,6 +5,7 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/supotsu-no-ochaya/backend/internal/hooks"
 	"github.com/supotsu-no-ochaya/backend/internal/routes"
 )
 
@@ -15,6 +16,8 @@ func main() {
 		routes.RegisterAPIRoutes(e, app)
 		return e.Next()
 	})
+
+	hooks.RegisterHooks(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
