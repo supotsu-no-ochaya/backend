@@ -4,7 +4,7 @@ LABEL description="Supotsu no Ochaya - Backend"
 LABEL website="https://supotsu-no-ochaya.github.io/"
 
 WORKDIR /app
-VOLUME /app/pb_data /app/config /app/log
+VOLUME /app/pb_data /app/config
 
 ARG TARGETARCH
 ARG TARGETOS
