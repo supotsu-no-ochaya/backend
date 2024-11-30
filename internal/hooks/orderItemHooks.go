@@ -19,7 +19,7 @@ const (
 	orderItemStatusGeliefert   orderItemStatus = "Geliefert"   //nolint:unused
 )
 
-func registerOrderItemHooks(app *pocketbase.PocketBase) {
+func RegisterOrderItemHooks(app *pocketbase.PocketBase) {
 	app.OnRecordAfterCreateSuccess(orderItemTableName).BindFunc(orderItemAfterCreateSuccess)
 	app.OnRecordAfterUpdateSuccess(orderItemTableName).BindFunc(orderItemAfterUpdateSuccess)
 }

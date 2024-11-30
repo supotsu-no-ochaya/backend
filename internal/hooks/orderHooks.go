@@ -19,7 +19,7 @@ const (
 	orderStatusBezahlt     orderStatus = "Bezahlt"
 )
 
-func registerOrderHooks(app *pocketbase.PocketBase) {
+func RegisterOrderHooks(app *pocketbase.PocketBase) {
 	app.OnRecordAfterCreateSuccess(orderItemTableName).BindFunc(orderAfterCreateSuccess)
 	app.OnRecordAfterUpdateSuccess(orderItemTableName).BindFunc(orderAfterUpdateSuccess)
 }
