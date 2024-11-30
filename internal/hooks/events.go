@@ -27,12 +27,12 @@ type eventContent interface {
 
 type orderEvent struct {
 	OrderId string      `json:"order_id"` // JSON key will be "order_id"
-	Status  orderStatus `json:"Status"`   // JSON key will be "Status"
+	Status  orderStatus `json:"status"`   // JSON key will be "status"
 }
 
 type orderItemEvent struct {
 	OrderItemId string          `json:"order_item_id"` // JSON key will be "order_item_id"
-	Status      orderItemStatus `json:"Status"`        // JSON key will be "Status"
+	Status      orderItemStatus `json:"status"`        // JSON key will be "status"
 }
 
 func constructEvent[T eventContent](content T) event[T] {
