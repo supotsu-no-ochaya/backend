@@ -20,8 +20,8 @@ const (
 )
 
 func RegisterOrderHooks(app *pocketbase.PocketBase) {
-	app.OnRecordAfterCreateSuccess(orderItemTableName).BindFunc(orderAfterCreateSuccess)
-	app.OnRecordAfterUpdateSuccess(orderItemTableName).BindFunc(orderAfterUpdateSuccess)
+	app.OnRecordAfterCreateSuccess(orderTableName).BindFunc(orderAfterCreateSuccess)
+	app.OnRecordAfterUpdateSuccess(orderTableName).BindFunc(orderAfterUpdateSuccess)
 }
 
 func orderAfterCreateSuccess(orderRecordEvent *core.RecordEvent) error {
