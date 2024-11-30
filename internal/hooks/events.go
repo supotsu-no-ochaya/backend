@@ -61,7 +61,7 @@ func (e event[T]) save(app core.App) error {
 
 	contentString := e.stringifyContent()
 	record := core.NewRecord(collection)
-	record.Set("type", e.eventType)
+	record.Set("type", string(e.eventType))
 	record.Set("content", contentString)
 
 	return app.Save(record)

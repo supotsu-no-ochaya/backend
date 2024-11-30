@@ -75,7 +75,7 @@ func handleOrderItemStatusUpdate(orderItemRecordEvent *core.RecordEvent) error {
 			if err != nil {
 				return err
 			}
-			order.Set("status", orderStatusInArbeit)
+			order.Set("status", string(orderStatusInArbeit))
 			return orderItemRecordEvent.App.Save(order)
 		}
 	}
