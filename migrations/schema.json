@@ -340,7 +340,6 @@
     "passwordAuth": {
       "enabled": true,
       "identityFields": [
-        "email",
         "username"
       ]
     },
@@ -1700,7 +1699,7 @@
         "min": 0,
         "name": "role_name",
         "pattern": "",
-        "presentable": false,
+        "presentable": true,
         "primaryKey": false,
         "required": true,
         "system": false,
