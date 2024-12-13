@@ -913,6 +913,81 @@
     "system": false
   },
   {
+    "id": "06q9vcp73o1kbpt",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "menu_categ",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "puhm23ap",
+        "max": 0,
+        "min": 0,
+        "name": "name",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": true,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "06q9vcp73o1kbpt",
+        "hidden": false,
+        "id": "relation3485423056",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "parent_categ",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "system": false
+  },
+  {
     "id": "u6p4cvesavbavcm",
     "listRule": null,
     "viewRule": null,
@@ -971,6 +1046,19 @@
         "required": true,
         "system": false,
         "type": "json"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "06q9vcp73o1kbpt",
+        "hidden": false,
+        "id": "relation105650625",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "category",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
       },
       {
         "hidden": false,
@@ -1420,19 +1508,6 @@
       },
       {
         "cascadeDelete": false,
-        "collectionId": "06q9vcp73o1kbpt",
-        "hidden": false,
-        "id": "czmndrx2",
-        "maxSelect": 1,
-        "minSelect": 0,
-        "name": "category",
-        "presentable": false,
-        "required": true,
-        "system": false,
-        "type": "relation"
-      },
-      {
-        "cascadeDelete": false,
         "collectionId": "ochh32m9c4pkqzy",
         "hidden": false,
         "id": "m8g6wgiv",
@@ -1452,6 +1527,19 @@
         "maxSelect": 2147483647,
         "minSelect": 0,
         "name": "attribute",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_1454256526",
+        "hidden": false,
+        "id": "relation2363381545",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "type",
         "presentable": false,
         "required": false,
         "system": false,
@@ -1544,13 +1632,13 @@
     "system": false
   },
   {
-    "id": "06q9vcp73o1kbpt",
+    "id": "pbc_1454256526",
     "listRule": null,
     "viewRule": null,
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "product_categ",
+    "name": "product_type",
     "type": "base",
     "fields": [
       {
@@ -1570,14 +1658,14 @@
       {
         "autogeneratePattern": "",
         "hidden": false,
-        "id": "puhm23ap",
+        "id": "text1579384326",
         "max": 0,
         "min": 0,
         "name": "name",
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
-        "required": true,
+        "required": false,
         "system": false,
         "type": "text"
       },
