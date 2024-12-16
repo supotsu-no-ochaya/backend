@@ -7,6 +7,9 @@ services:
     volumes:
       - pb-data:/app/pb_data
       - config:/app/config
+    environment:
+      - SUPERUSER_EMAIL=admin@admin.admin
+      - SUPERUSER_PASSWORD=1234567890
 
 volumes:
   pb-data:
