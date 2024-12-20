@@ -169,6 +169,20 @@ func fetchOrdersWithItems(app core.App, startTime, endTime time.Time) ([]map[str
 		if err != nil {
 			return nil, nil, nil, err
 		}
+
+		// Enrich "menu_item"
+		if menuItemID, ok := orderItemMap["menu_item"].(string); ok && menuItemID != "" {
+			menuItemRecord, err := app.FindRecordById("menu_item", menuItemID)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			menuItemMap, err := getCleanRecordMap(menuItemRecord)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			orderItemMap["menu_item"] = menuItemMap
+		}
+
 		orderItemID := record.Id
 		orderItemsMap[orderItemID] = orderItemMap
 
