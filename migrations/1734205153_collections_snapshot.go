@@ -276,9 +276,7 @@ func init() {
 					}
 				],
 				"id": "t1eu98fwy68rm2s",
-				"indexes": [
-					"CREATE UNIQUE INDEX ` + "`" + `idx_C47X8AePyn` + "`" + ` ON ` + "`" + `user_role` + "`" + ` (` + "`" + `role_name` + "`" + `)"
-				],
+				"indexes": [],
 				"listRule": null,
 				"name": "user_role",
 				"system": false,
@@ -336,7 +334,7 @@ func init() {
 						"minSelect": 0,
 						"name": "station",
 						"presentable": false,
-						"required": false,
+						"required": true,
 						"system": false,
 						"type": "relation"
 					},
@@ -385,6 +383,19 @@ func init() {
 						"presentable": false,
 						"system": false,
 						"type": "autodate"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "06q9vcp73o1kbpt",
+						"hidden": false,
+						"id": "czmndrx2",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "category",
+						"presentable": false,
+						"required": true,
+						"system": false,
+						"type": "relation"
 					}
 				],
 				"id": "cyt4jouk6ds1kg6",
@@ -559,7 +570,7 @@ func init() {
 						"min": 0,
 						"name": "name",
 						"pattern": "",
-						"presentable": true,
+						"presentable": false,
 						"primaryKey": false,
 						"required": true,
 						"system": false,
@@ -587,15 +598,13 @@ func init() {
 					}
 				],
 				"id": "mzoo193gv091g9t",
-				"indexes": [
-					"CREATE UNIQUE INDEX ` + "`" + `idx_Hdwv3ZFSkg` + "`" + ` ON ` + "`" + `product_attribute` + "`" + ` (` + "`" + `name` + "`" + `)"
-				],
-				"listRule": "",
+				"indexes": [],
+				"listRule": null,
 				"name": "product_attribute",
 				"system": false,
 				"type": "base",
 				"updateRule": null,
-				"viewRule": ""
+				"viewRule": null
 			},
 			{
 				"createRule": null,
@@ -745,7 +754,7 @@ func init() {
 				],
 				"id": "rr00ce5tgdltjhk",
 				"indexes": [],
-				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\"",
+				"listRule": "",
 				"name": "admin_settings",
 				"system": false,
 				"type": "base",
@@ -910,19 +919,6 @@ func init() {
 							"Abholbereit",
 							"Geliefert"
 						]
-					},
-					{
-						"cascadeDelete": false,
-						"collectionId": "u6p4cvesavbavcm",
-						"hidden": false,
-						"id": "relation3612661072",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "menu_item",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "relation"
 					},
 					{
 						"hidden": false,
@@ -1132,9 +1128,7 @@ func init() {
 					}
 				],
 				"id": "r1y4310sz0fnzza",
-				"indexes": [
-					"CREATE UNIQUE INDEX ` + "`" + `idx_kHiBXvR0kF` + "`" + ` ON ` + "`" + `payment_option` + "`" + ` (` + "`" + `name` + "`" + `)"
-				],
+				"indexes": [],
 				"listRule": null,
 				"name": "payment_option",
 				"system": false,
