@@ -587,7 +587,9 @@ func init() {
 					}
 				],
 				"id": "mzoo193gv091g9t",
-				"indexes": [],
+				"indexes": [
+					"CREATE UNIQUE INDEX ` + "`" + `idx_Hdwv3ZFSkg` + "`" + ` ON ` + "`" + `product_attribute` + "`" + ` (` + "`" + `name` + "`" + `)"
+				],
 				"listRule": "",
 				"name": "product_attribute",
 				"system": false,
@@ -1117,7 +1119,9 @@ func init() {
 					}
 				],
 				"id": "r1y4310sz0fnzza",
-				"indexes": [],
+				"indexes": [
+					"CREATE UNIQUE INDEX ` + "`" + `idx_kHiBXvR0kF` + "`" + ` ON ` + "`" + `payment_option` + "`" + ` (` + "`" + `name` + "`" + `)"
+				],
 				"listRule": null,
 				"name": "payment_option",
 				"system": false,
