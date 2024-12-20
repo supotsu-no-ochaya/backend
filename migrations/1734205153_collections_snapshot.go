@@ -276,7 +276,9 @@ func init() {
 					}
 				],
 				"id": "t1eu98fwy68rm2s",
-				"indexes": [],
+				"indexes": [
+					"CREATE UNIQUE INDEX ` + "`" + `idx_C47X8AePyn` + "`" + ` ON ` + "`" + `user_role` + "`" + ` (` + "`" + `role_name` + "`" + `)"
+				],
 				"listRule": null,
 				"name": "user_role",
 				"system": false,
@@ -334,7 +336,7 @@ func init() {
 						"minSelect": 0,
 						"name": "station",
 						"presentable": false,
-						"required": true,
+						"required": false,
 						"system": false,
 						"type": "relation"
 					},
@@ -383,19 +385,6 @@ func init() {
 						"presentable": false,
 						"system": false,
 						"type": "autodate"
-					},
-					{
-						"cascadeDelete": false,
-						"collectionId": "06q9vcp73o1kbpt",
-						"hidden": false,
-						"id": "czmndrx2",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "category",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "relation"
 					}
 				],
 				"id": "cyt4jouk6ds1kg6",
@@ -570,7 +559,7 @@ func init() {
 						"min": 0,
 						"name": "name",
 						"pattern": "",
-						"presentable": false,
+						"presentable": true,
 						"primaryKey": false,
 						"required": true,
 						"system": false,
@@ -599,12 +588,12 @@ func init() {
 				],
 				"id": "mzoo193gv091g9t",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "",
 				"name": "product_attribute",
 				"system": false,
 				"type": "base",
 				"updateRule": null,
-				"viewRule": null
+				"viewRule": ""
 			},
 			{
 				"createRule": null,
@@ -754,7 +743,7 @@ func init() {
 				],
 				"id": "rr00ce5tgdltjhk",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\"",
 				"name": "admin_settings",
 				"system": false,
 				"type": "base",
