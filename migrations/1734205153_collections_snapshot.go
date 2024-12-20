@@ -279,16 +279,16 @@ func init() {
 				"indexes": [
 					"CREATE UNIQUE INDEX ` + "`" + `idx_C47X8AePyn` + "`" + ` ON ` + "`" + `user_role` + "`" + ` (` + "`" + `role_name` + "`" + `)"
 				],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"name": "user_role",
 				"system": false,
 				"type": "base",
 				"updateRule": null,
-				"viewRule": null
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -389,16 +389,16 @@ func init() {
 				],
 				"id": "cyt4jouk6ds1kg6",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "product",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -464,16 +464,16 @@ func init() {
 				],
 				"id": "06q9vcp73o1kbpt",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "menu_categ",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -526,16 +526,16 @@ func init() {
 				],
 				"id": "ochh32m9c4pkqzy",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "station",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -590,16 +590,16 @@ func init() {
 				"indexes": [
 					"CREATE UNIQUE INDEX ` + "`" + `idx_Hdwv3ZFSkg` + "`" + ` ON ` + "`" + `product_attribute` + "`" + ` (` + "`" + `name` + "`" + `)"
 				],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "product_attribute",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -687,16 +687,16 @@ func init() {
 				],
 				"id": "u6p4cvesavbavcm",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "menu_item",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -749,12 +749,12 @@ func init() {
 				"name": "admin_settings",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Küchenchef\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -835,16 +835,16 @@ func init() {
 				],
 				"id": "a334lg0romdf0i3",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "order",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -934,16 +934,16 @@ func init() {
 				],
 				"id": "4hacy7mqj13o9nq",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "order_item",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1044,12 +1044,12 @@ func init() {
 				],
 				"id": "v3mg6x61b6kit2g",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
 				"name": "payment",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\""
 			},
 			{
 				"createRule": null,
@@ -1122,12 +1122,12 @@ func init() {
 				"indexes": [
 					"CREATE UNIQUE INDEX ` + "`" + `idx_kHiBXvR0kF` + "`" + ` ON ` + "`" + `payment_option` + "`" + ` (` + "`" + `name` + "`" + `)"
 				],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\"",
 				"name": "payment_option",
 				"system": false,
 				"type": "base",
 				"updateRule": null,
-				"viewRule": null
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\""
 			},
 			{
 				"createRule": null,
@@ -1197,78 +1197,6 @@ func init() {
 				"indexes": [],
 				"listRule": null,
 				"name": "event",
-				"system": false,
-				"type": "base",
-				"updateRule": null,
-				"viewRule": null
-			},
-			{
-				"createRule": null,
-				"deleteRule": null,
-				"fields": [
-					{
-						"autogeneratePattern": "[a-z0-9]{15}",
-						"hidden": false,
-						"id": "text3208210256",
-						"max": 15,
-						"min": 15,
-						"name": "id",
-						"pattern": "^[a-z0-9]+$",
-						"presentable": false,
-						"primaryKey": true,
-						"required": true,
-						"system": true,
-						"type": "text"
-					},
-					{
-						"hidden": false,
-						"id": "er7efk9m",
-						"maxSize": 2000000,
-						"name": "template",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "json"
-					},
-					{
-						"hidden": false,
-						"id": "mn0zi13r",
-						"maxSelect": 1,
-						"name": "type",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "select",
-						"values": [
-							"fixed",
-							"selectable"
-						]
-					},
-					{
-						"hidden": false,
-						"id": "autodate2990389176",
-						"name": "created",
-						"onCreate": true,
-						"onUpdate": false,
-						"presentable": false,
-						"system": false,
-						"type": "autodate"
-					},
-					{
-						"hidden": false,
-						"id": "autodate3332085495",
-						"name": "updated",
-						"onCreate": true,
-						"onUpdate": true,
-						"presentable": false,
-						"system": false,
-						"type": "autodate"
-					}
-				],
-				"id": "i1lcixnuvt2kbct",
-				"indexes": [],
-				"listRule": null,
-				"name": "bom_template",
 				"system": false,
 				"type": "base",
 				"updateRule": null,
@@ -1843,8 +1771,8 @@ func init() {
 				"viewRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId"
 			},
 			{
-				"createRule": null,
-				"deleteRule": null,
+				"createRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1897,12 +1825,12 @@ func init() {
 				],
 				"id": "pbc_1454256526",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\"",
 				"name": "product_type",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
-				"viewRule": null
+				"updateRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\"",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.role.role_name = \"Kuechenchef\" || @request.auth.role.role_name = \"Kellner\" || @request.auth.role.role_name = \"Kueche\""
 			}
 		]`
 
