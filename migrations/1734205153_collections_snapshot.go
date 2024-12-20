@@ -912,6 +912,19 @@ func init() {
 						]
 					},
 					{
+						"cascadeDelete": false,
+						"collectionId": "u6p4cvesavbavcm",
+						"hidden": false,
+						"id": "relation3612661072",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "menu_item",
+						"presentable": false,
+						"required": true,
+						"system": false,
+						"type": "relation"
+					},
+					{
 						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
