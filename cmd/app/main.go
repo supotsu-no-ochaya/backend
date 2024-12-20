@@ -22,6 +22,7 @@ func main() {
 
 	hooks.RegisterOrderHooks(app)
 	hooks.RegisterOrderItemHooks(app)
+	hooks.RegisterProductHooks(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
