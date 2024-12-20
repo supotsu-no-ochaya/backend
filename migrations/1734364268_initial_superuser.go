@@ -16,12 +16,12 @@ func init() {
 		record := core.NewRecord(superusers)
 
 		// Load email and password from environment variables with default values
-		email := os.Getenv("SUPERUSER_EMAIL")
+		email := os.Getenv("PB_SUPERUSER_EMAIL")
 		if email == "" {
 			email = "admin@admin.admin"
 		}
 
-		password := os.Getenv("SUPERUSER_PASSWORD")
+		password := os.Getenv("PB_SUPERUSER_PASSWORD")
 		if password == "" {
 			password = "1234567890"
 		}
@@ -31,7 +31,7 @@ func init() {
 
 		return app.Save(record)
 	}, func(app core.App) error { // optional revert operation
-		email := os.Getenv("SUPERUSER_EMAIL")
+		email := os.Getenv("PB_SUPERUSER_EMAIL")
 		if email == "" {
 			email = "admin@admin.admin"
 		}
