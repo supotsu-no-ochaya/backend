@@ -8,16 +8,23 @@ This is a backend service built using PocketBase and Echo.
 2. Make sure Go is installed on your machine.
 3. Use the following commands to start the backend:
 
-   - **For Development**:
+   - **For Development (run from source code)**:
+     - Ensure the **`download-testdata.sh`** script has been executed if there is no test data yet. This script writes the test data into the current working directory in a folder named `pb_data`, which both the binary and Docker Compose setup expect to be present.
+       ```sh
+       ./download-testdata.sh v1  
+       ```
+       ```sh
+       go run main.go --dev serve
+       ```
 
-     ```sh
-     ./download-testdata.sh v1  
-     ```
-
-     ```sh
-     go run main.go --dev serve
-     ```
-
+   - **For Development (run via docker compose)**:
+     - Ensure the **`download-testdata.sh`** script has been executed if there is no test data yet. This script writes the test data into the current working directory in a folder named `pb_data`, which both the binary and Docker Compose setup expect to be present.
+       ```sh
+       ./download-testdata.sh v1  
+       ```
+       ```sh
+       docker compose up -d
+       ```
    - **For Production**:
 
      ```sh
