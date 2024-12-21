@@ -57,3 +57,5 @@ tmp/
 pb_data/
 dist/
 supotsu-backend
+# do not ignore testdata uploads
+!testdata/**

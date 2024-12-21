@@ -5,12 +5,8 @@ services:
     ports:
       - "8090:8090"
     volumes:
-      - pb-data:/app/pb_data
-      - config:/app/config
-    environment:
-      - PB_SUPERUSER_EMAIL=admin@admin.admin
-      - PB_SUPERUSER_PASSWORD=1234567890
-
-volumes:
-  pb-data:
-  config:
+      - ./pb_data:/app/pb_data
+# only required if not downloading testdata
+#    environment:
+#      - PB_SUPERUSER_EMAIL=admin@admin.admin
+#      - PB_SUPERUSER_PASSWORD=1234567890

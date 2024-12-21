@@ -11,6 +11,10 @@ This is a backend service built using PocketBase and Echo.
    - **For Development**:
 
      ```sh
+     ./download-testdata.sh v1  
+     ```
+
+     ```sh
      go run main.go --dev serve
      ```
 
