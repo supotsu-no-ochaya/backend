@@ -19,6 +19,7 @@ type eventType string
 const (
 	orderEventType     = eventType(orderTableName)
 	orderItemEventType = eventType(orderItemTableName)
+	productEventType   = eventType(productTableName) // Added for product events
 )
 
 // Define the mapping between eventType and eventContent
@@ -26,14 +27,22 @@ type eventMapping interface {
 	getEventType() eventType
 }
 
+// Order event
 type orderEvent struct {
-	OrderId string      `json:"order_id"` // JSON key will be "order_id"
-	Status  orderStatus `json:"status"`   // JSON key will be "status"
+	OrderId string      `json:"order_id"`
+	Status  orderStatus `json:"status"`
 }
 
+// Order item event
 type orderItemEvent struct {
-	OrderItemId string          `json:"order_item_id"` // JSON key will be "order_item_id"
-	Status      orderItemStatus `json:"status"`        // JSON key will be "status"
+	OrderItemId string          `json:"order_item_id"`
+	Status      orderItemStatus `json:"status"`
+}
+
+// Product event
+type productEvent struct {
+	ProductId   string `json:"product_id"`
+	IsAvailable bool   `json:"is_available"`
 }
 
 // Associate `orderEvent` with `orderEventType`
@@ -44,6 +53,11 @@ func (orderEvent) getEventType() eventType {
 // Associate `orderItemEvent` with `orderItemEventType`
 func (orderItemEvent) getEventType() eventType {
 	return orderItemEventType
+}
+
+// Associate `productEvent` with `productEventType`
+func (productEvent) getEventType() eventType {
+	return productEventType
 }
 
 func constructEvent[T eventMapping](content T) event[T] {

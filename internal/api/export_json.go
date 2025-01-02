@@ -47,14 +47,22 @@ func ExportJSONHandler(app core.App) func(e *core.RequestEvent) error {
 		}
 		exportData.Products = products
 
-		// Fetch orders with order_items and build maps
+		// Create a productsMap to easily attach product events
+		productsMap := make(map[string]map[string]interface{}, len(products))
+		for _, p := range products {
+			if idVal, ok := p["id"].(string); ok {
+				productsMap[idVal] = p
+			}
+		}
+
+		// Fetch orders with order_items
 		orders, ordersMap, orderItemsMap, err := fetchOrdersWithItems(app, startTime, endTime)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Orders = orders
 
-		// Fetch payments and build paymentsMap
+		// Fetch payments
 		payments, paymentsMap, err := fetchAndEnrichPayments(app, startTime, endTime)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
@@ -62,7 +70,7 @@ func ExportJSONHandler(app core.App) func(e *core.RequestEvent) error {
 		exportData.Payments = payments
 
 		// Fetch events and assign them to the appropriate objects
-		err = processEventsAndAssign(app, startTime, endTime, ordersMap, orderItemsMap, paymentsMap)
+		err = processEventsAndAssign(app, startTime, endTime, ordersMap, orderItemsMap, paymentsMap, productsMap)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
@@ -245,12 +253,17 @@ func fetchAndEnrichPayments(app core.App, startTime, endTime time.Time) ([]map[s
 }
 
 // processEventsAndAssign processes events and assigns them to orders, order_items, or payments
-func processEventsAndAssign(app core.App, startTime, endTime time.Time, ordersMap, orderItemsMap, paymentsMap map[string]map[string]interface{}) error {
+func processEventsAndAssign(
+	app core.App,
+	startTime, endTime time.Time,
+	ordersMap, orderItemsMap, paymentsMap, productsMap map[string]map[string]interface{},
+) error {
 	filter := "created >= {:start} && created <= {:end}"
 	params := dbx.Params{
 		"start": startTime,
 		"end":   endTime,
 	}
+
 	eventRecords, err := app.FindRecordsByFilter("event", filter, "", 0, 0, params)
 	if err != nil {
 		return err
@@ -275,20 +288,23 @@ func processEventsAndAssign(app core.App, startTime, endTime time.Time, ordersMa
 		case "order_item":
 			orderItemID, _ := content["order_item_id"].(string)
 			if orderItem, ok := orderItemsMap[orderItemID]; ok {
-				// Append event to orderItem["events"]
 				appendEvent(orderItem, eventMap)
 			}
 		case "order":
 			orderID, _ := content["order_id"].(string)
 			if order, ok := ordersMap[orderID]; ok {
-				// Append event to order["events"]
 				appendEvent(order, eventMap)
 			}
 		case "payment":
 			paymentID, _ := content["payment_id"].(string)
 			if payment, ok := paymentsMap[paymentID]; ok {
-				// Append event to payment["events"]
 				appendEvent(payment, eventMap)
+			}
+		case "product":
+			// Handle product events
+			productID, _ := content["product_id"].(string)
+			if product, ok := productsMap[productID]; ok {
+				appendEvent(product, eventMap)
 			}
 		default:
 			// Unknown type, ignore or handle as needed

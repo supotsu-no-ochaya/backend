@@ -1172,7 +1172,8 @@ func init() {
 						"values": [
 							"order",
 							"order_item",
-							"payment"
+							"payment",
+							"product"
 						]
 					},
 					{
