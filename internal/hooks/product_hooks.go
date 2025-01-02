@@ -10,19 +10,8 @@ const (
 )
 
 func RegisterProductHooks(app *pocketbase.PocketBase) {
-	app.OnRecordAfterCreateSuccess().BindFunc(func(e *core.RecordEvent) error {
-		if e.Record.Collection().Name == productTableName {
-			return productAfterCreateSuccess(e)
-		}
-		return e.Next()
-	})
-
-	app.OnRecordAfterUpdateSuccess().BindFunc(func(e *core.RecordEvent) error {
-		if e.Record.Collection().Name == productTableName {
-			return productAfterUpdateSuccess(e)
-		}
-		return e.Next()
-	})
+	app.OnRecordAfterCreateSuccess(productTableName).BindFunc(productAfterCreateSuccess)
+	app.OnRecordAfterUpdateSuccess(productTableName).BindFunc(productAfterUpdateSuccess)
 }
 
 func productAfterCreateSuccess(e *core.RecordEvent) error {
