@@ -12,10 +12,11 @@ import (
 )
 
 type ExportData struct {
-	Filter   FilterData               `json:"filter"`
-	Products []map[string]interface{} `json:"products"`
-	Orders   []map[string]interface{} `json:"orders"`
-	Payments []map[string]interface{} `json:"payments"`
+	Filter    FilterData               `json:"filter"`
+	Products  []map[string]interface{} `json:"products"`
+	MenuItems []map[string]interface{} `json:"menu_items"`
+	Orders    []map[string]interface{} `json:"orders"`
+	Payments  []map[string]interface{} `json:"payments"`
 }
 
 type FilterData struct {
@@ -46,6 +47,13 @@ func ExportJSONHandler(app core.App) func(e *core.RequestEvent) error {
 			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
 		exportData.Products = products
+
+		// Fetch all menu items
+		menuItems, err := fetchMenuItems(app)
+		if err != nil {
+			return e.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		exportData.MenuItems = menuItems
 
 		// Create a productsMap to easily attach product events
 		productsMap := make(map[string]map[string]interface{}, len(products))
@@ -128,6 +136,25 @@ func fetchAndEnrichProducts(app core.App) ([]map[string]interface{}, error) {
 		products = append(products, enrichedProductMap)
 	}
 	return products, nil
+}
+
+// fetchMenuItems fetches all menu items
+func fetchMenuItems(app core.App) ([]map[string]interface{}, error) {
+	menuItemRecords, err := app.FindAllRecords("menu_item")
+	if err != nil {
+		return nil, err
+	}
+
+	menuItems := make([]map[string]interface{}, 0, len(menuItemRecords))
+	for _, record := range menuItemRecords {
+		itemMap, err := getCleanRecordMap(record)
+		if err != nil {
+			return nil, err
+		}
+		menuItems = append(menuItems, itemMap)
+	}
+
+	return menuItems, nil
 }
 
 func stringSliceToInterfaceSlice(strings []string) []interface{} {
