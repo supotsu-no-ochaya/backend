@@ -35,7 +35,7 @@ The server will be running and accessible at [http://localhost:8090](http://loca
 
 ---
 
-### Contribute
+## Contribute
 1. Clone the repository.
 2. Make sure Go is installed on your machine.
 3. Use the following commands to start the backend:
