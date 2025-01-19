@@ -17,7 +17,7 @@ To download the testdata run the ```download-testdata.sh``` script by supplying 
 ```
 You can now run the docker container. 
 ```shell
-docker compose up -d -f docker-compose.yml
+docker compose up -d
 ```
 
 ### Run without testdata
