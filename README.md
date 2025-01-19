@@ -2,8 +2,40 @@
 
 This is a backend service built using PocketBase and Echo.
 
-## How to Start the Backend
+---
 
+## Run the backend
+Requirements: 
+* Docker
+
+### Run with testdata
+To run the docker container with testdata you need to run the ```docker-compose.yml``` 
+and need to have the ```pb_data``` testdata folder. This folder will be mounted into the container to supply it with the testdata.
+To download the testdata run the ```download-testdata.sh``` script by supplying the latest testdatat version e.g.: 
+```shell
+./download-testdata.sh v2
+```
+You can now run the docker container. 
+```shell
+docker compose up -d -f docker-compose.yml
+```
+
+### Run without testdata
+To run the docker container without testdata simply run the ```docker-compose.prod.yml```.
+The ```docker-compose.prod.yml``` serves as an example configuration.
+For security you should provide your own credentials as environment variables e.g. via an env file.
+
+```shell
+docker compose up -d -f docker-compose.prod.yml
+```
+---
+The server will be running and accessible at [http://localhost:8090](http://localhost:8090).
+- REST API: [http://127.0.0.1:8090/api/](http://127.0.0.1:8090/api/)
+- Admin UI: [http://127.0.0.1:8090/_/](http://127.0.0.1:8090/_/)
+
+---
+
+### Contribute
 1. Clone the repository.
 2. Make sure Go is installed on your machine.
 3. Use the following commands to start the backend:
@@ -25,15 +57,8 @@ This is a backend service built using PocketBase and Echo.
        ```sh
        docker compose up -d
        ```
-   - **For Production**:
 
-     ```sh
-     go run main.go serve
-     ```
-
-4. The server will be running and accessible at [http://localhost:8090](http://localhost:8090).
-   - REST API: [http://127.0.0.1:8090/api/](http://127.0.0.1:8090/api/)
-   - Admin UI: [http://127.0.0.1:8090/_/](http://127.0.0.1:8090/_/)
+---
 
 ## API Endpoint
 
@@ -47,7 +72,6 @@ Fetches all user records from the database.
     ```sh
     curl -X GET http://localhost:8090/api/test
     ```
-
 
 ### `/api/export-json`
 Exports product and event data within a specified datetime range as a JSON file.
