@@ -1524,7 +1524,8 @@ func init() {
 							"Aufgegeben",
 							"InArbeit",
 							"Abholbereit",
-							"Geliefert"
+							"Geliefert",
+							"Bezahlt"
 						]
 					},
 					{
