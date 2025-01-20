@@ -26,7 +26,7 @@ The ```docker-compose.prod.yml``` serves as an example configuration.
 For security you should provide your own credentials as environment variables e.g. via an env file.
 
 ```shell
-docker compose up -d -f docker-compose.prod.yml
+docker compose -f docker-compose.prod.yml up -d
 ```
 ---
 The server will be running and accessible at [http://localhost:8090](http://localhost:8090).
