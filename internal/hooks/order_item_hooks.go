@@ -1,6 +1,7 @@
 package hooks
 
 import (
+	"fmt"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
@@ -18,6 +19,33 @@ const (
 	orderItemStatusAbholbereit orderItemStatus = "Abholbereit" //nolint:unused
 	orderItemStatusGeliefert   orderItemStatus = "Geliefert"   //nolint:unused
 )
+
+func requiresOrderStatusUpdateCheck(status orderItemStatus) bool {
+	switch status {
+	case orderItemStatusAufgegeben,
+		orderItemStatusInArbeit,
+		orderItemStatusAbholbereit,
+		orderItemStatusGeliefert:
+		return true
+	default:
+		return false
+	}
+}
+
+func mapOrderItemStatusToOrderStatus(orderItemStatus orderItemStatus) orderStatus {
+	switch orderItemStatus {
+	case orderItemStatusAufgegeben:
+		return orderStatusAufgegeben
+	case orderItemStatusInArbeit:
+		return orderStatusInArbeit
+	case orderItemStatusAbholbereit:
+		return orderStatusAbholbereit
+	case orderItemStatusGeliefert:
+		return orderStatusGeliefert
+	default:
+		panic("invalid order item status") // TODO remove panic for error propagation
+	}
+}
 
 func RegisterOrderItemHooks(app *pocketbase.PocketBase) {
 	app.OnRecordAfterCreateSuccess(orderItemTableName).BindFunc(orderItemAfterCreateSuccess)
@@ -38,14 +66,14 @@ func orderItemAfterUpdateSuccess(orderItemRecordEvent *core.RecordEvent) error {
 	newStatus := orderItemStatus(orderItemRecordEvent.Record.GetString("status"))
 
 	// If Status hasn't changed, no action is needed.
-	if oldStatus != newStatus {
-		return handleOrderItemStatusUpdate(orderItemRecordEvent)
+	if oldStatus == newStatus {
+		return nil
 	}
-
-	return nil
+	return handleOrderItemStatusUpdate(orderItemRecordEvent)
 }
 
 func handleOrderItemStatusUpdate(orderItemRecordEvent *core.RecordEvent) error {
+	app := orderItemRecordEvent.App
 	orderItemEvent := orderItemEvent{
 		OrderItemId: orderItemRecordEvent.Record.Get("id").(string),
 		Status:      orderItemStatus(orderItemRecordEvent.Record.Get("status").(string)),
@@ -55,9 +83,11 @@ func handleOrderItemStatusUpdate(orderItemRecordEvent *core.RecordEvent) error {
 		return err
 	}
 
+	status := orderItemStatus(orderItemRecordEvent.Record.GetString("status"))
 	// find the "order" the updated "order item" belongs to
-	// if all "order items" attached to that order are now in Status "inArbeit, set the "order" Status to "inArbeit"
-	if orderItemStatus(orderItemRecordEvent.Record.GetString("status")) == orderItemStatusInArbeit {
+	// if all "order items" attached to that order are now in the same orderItemStatus set the order status to the equivilant status
+	// e.g. if all order items are in status "InArbeit" set the order status to the "InArbeit" status as well.
+	if requiresOrderStatusUpdateCheck(status) {
 		orderID := orderItemRecordEvent.Record.GetString("order")
 		orderItems, err := orderItemRecordEvent.App.FindRecordsByFilter(
 			orderItemTableName,
@@ -71,12 +101,29 @@ func handleOrderItemStatusUpdate(orderItemRecordEvent *core.RecordEvent) error {
 			return err
 		}
 		if allOrderItemsHaveStatus(orderItems, orderItemRecordEvent.Record.GetString("status")) {
+			app.Logger().Info(
+				fmt.Sprintf("All order items of order (id: %s) are in status: %s ... Updating order status.", orderID, status),
+			)
 			order, err := orderItemRecordEvent.App.FindRecordById("order", orderID)
 			if err != nil {
+				app.Logger().Error(
+					fmt.Sprintf("Failed to find order with id: %s", orderID),
+				)
 				return err
 			}
-			order.Set("status", string(orderStatusInArbeit))
-			return orderItemRecordEvent.App.Save(order)
+			order.Set("status", string(mapOrderItemStatusToOrderStatus(status)))
+			orderUpdateErr := orderItemRecordEvent.App.Save(order)
+			if orderUpdateErr != nil {
+				app.Logger().Error(
+					fmt.Sprintf("Failed to save order with id: %s", orderID),
+				)
+				return orderUpdateErr
+			}
+			app.Logger().Info(
+				fmt.Sprintf("Successfully updated order with id: %s to status: %s", orderID, status),
+			)
+
+			return nil
 		}
 	}
 	return nil
