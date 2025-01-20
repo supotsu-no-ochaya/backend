@@ -1603,19 +1603,6 @@ func init() {
 						"type": "text"
 					},
 					{
-						"cascadeDelete": false,
-						"collectionId": "a334lg0romdf0i3",
-						"hidden": false,
-						"id": "id6zss5r",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "order",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "relation"
-					},
-					{
 						"hidden": false,
 						"id": "m5gqfwpa",
 						"max": null,
@@ -1659,6 +1646,19 @@ func init() {
 						"maxSelect": 1,
 						"minSelect": 0,
 						"name": "payment_option",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "4hacy7mqj13o9nq",
+						"hidden": false,
+						"id": "relation1652596144",
+						"maxSelect": 999,
+						"minSelect": 0,
+						"name": "order_items",
 						"presentable": false,
 						"required": false,
 						"system": false,
