@@ -18,6 +18,7 @@ const (
 	orderItemStatusInArbeit    orderItemStatus = "InArbeit"    //nolint:unused
 	orderItemStatusAbholbereit orderItemStatus = "Abholbereit" //nolint:unused
 	orderItemStatusGeliefert   orderItemStatus = "Geliefert"   //nolint:unused
+	orderItemStatusBezahlt     orderItemStatus = "Bezahlt"     //nolint:unused
 )
 
 func requiresOrderStatusUpdateCheck(status orderItemStatus) bool {
@@ -25,7 +26,8 @@ func requiresOrderStatusUpdateCheck(status orderItemStatus) bool {
 	case orderItemStatusAufgegeben,
 		orderItemStatusInArbeit,
 		orderItemStatusAbholbereit,
-		orderItemStatusGeliefert:
+		orderItemStatusGeliefert,
+		orderItemStatusBezahlt:
 		return true
 	default:
 		return false
@@ -42,6 +44,8 @@ func mapOrderItemStatusToOrderStatus(orderItemStatus orderItemStatus) orderStatu
 		return orderStatusAbholbereit
 	case orderItemStatusGeliefert:
 		return orderStatusGeliefert
+	case orderItemStatusBezahlt:
+		return orderStatusBezahlt
 	default:
 		panic("invalid order item status") // TODO remove panic for error propagation
 	}

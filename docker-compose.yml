@@ -1,7 +1,8 @@
 # docker compose configuration requires a pb_data folder to be mounted into the container to supply testdata
 services:
   supotsu-backend:
-    image: ghcr.io/supotsu-no-ochaya/supotsu-backend:dev
+#    image: ghcr.io/supotsu-no-ochaya/supotsu-backend:dev
+    image: supotsu-backend:local
     container_name: supotsu-backend
     ports:
       - "8090:8090"
