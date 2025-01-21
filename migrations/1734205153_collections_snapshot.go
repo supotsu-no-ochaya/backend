@@ -759,7 +759,7 @@ func init() {
 					"CREATE UNIQUE INDEX ` + "`" + `__pb_users_auth__email_idx` + "`" + ` ON ` + "`" + `users` + "`" + ` (` + "`" + `email` + "`" + `) WHERE ` + "`" + `email` + "`" + ` != ''",
 					"CREATE UNIQUE INDEX ` + "`" + `__pb_users_auth__tokenKey_idx` + "`" + ` ON ` + "`" + `users` + "`" + ` (` + "`" + `tokenKey` + "`" + `)"
 				],
-				"listRule": "id = @request.auth.id",
+				"listRule": "@request.auth.id != \"\"",
 				"manageRule": null,
 				"mfa": {
 					"duration": 1800,
@@ -808,7 +808,7 @@ func init() {
 				"verificationToken": {
 					"duration": 604800
 				},
-				"viewRule": "id = @request.auth.id"
+				"viewRule": "@request.auth.id != \"\""
 			},
 			{
 				"createRule": null,
@@ -914,19 +914,6 @@ func init() {
 						"required": false,
 						"system": false,
 						"type": "bool"
-					},
-					{
-						"cascadeDelete": false,
-						"collectionId": "ochh32m9c4pkqzy",
-						"hidden": false,
-						"id": "m8g6wgiv",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "station",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "relation"
 					},
 					{
 						"cascadeDelete": false,
@@ -1281,6 +1268,19 @@ func init() {
 						"type": "file"
 					},
 					{
+						"cascadeDelete": false,
+						"collectionId": "ochh32m9c4pkqzy",
+						"hidden": false,
+						"id": "relation2671376561",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "station",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
 						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
@@ -1503,16 +1503,6 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "5grhs5if",
-						"maxSize": 2000000,
-						"name": "bom",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "json"
-					},
-					{
-						"hidden": false,
 						"id": "ry5mjrss",
 						"maxSelect": 1,
 						"name": "status",
@@ -1524,7 +1514,8 @@ func init() {
 							"Aufgegeben",
 							"InArbeit",
 							"Abholbereit",
-							"Geliefert"
+							"Geliefert",
+							"Bezahlt"
 						]
 					},
 					{
@@ -1553,6 +1544,19 @@ func init() {
 						"required": false,
 						"system": false,
 						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "cyt4jouk6ds1kg6",
+						"hidden": false,
+						"id": "relation3015334490",
+						"maxSelect": 999,
+						"minSelect": 0,
+						"name": "products",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
 					},
 					{
 						"hidden": false,
