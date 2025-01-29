@@ -57,7 +57,13 @@ The server will be running and accessible at [http://localhost:8090](http://loca
        ```sh
        docker compose up -d
        ```
-
+4. In case you need to build the docker image localy run:
+      ```sh
+   make docker-local
+      ```
+---
+## Release
+Releases of the docker image happens automatically via the ```container-release``` workflow in github actions. The pipeline runs automatically on every new commit on main. So on every direct push, merge or rebase etc..
 ---
 
 ## API Endpoint
