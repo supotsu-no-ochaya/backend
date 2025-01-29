@@ -46,7 +46,7 @@ The server will be running and accessible at [http://localhost:8090](http://loca
        ./download-testdata.sh v1  
        ```
        ```sh
-       go run main.go --dev serve
+       go run cmd/app/main.go --dev serve
        ```
 
    - **For Development (run via docker compose)**:
@@ -61,6 +61,7 @@ The server will be running and accessible at [http://localhost:8090](http://loca
       ```sh
    make docker-local
       ```
+   The docker image will be named ```supotsu-backend:local```
 ---
 ## Release
 Releases of the docker image happens automatically via the ```container-release``` workflow in github actions. The pipeline runs automatically on every new commit on main. So on every direct push, merge or rebase etc..

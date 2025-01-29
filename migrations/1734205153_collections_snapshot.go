@@ -1670,6 +1670,18 @@ func init() {
 					},
 					{
 						"hidden": false,
+						"id": "number886886774",
+						"max": null,
+						"min": null,
+						"name": "person",
+						"onlyInt": true,
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "number"
+					},
+					{
+						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
 						"onCreate": true,
