@@ -1282,6 +1282,15 @@ func init() {
 					},
 					{
 						"hidden": false,
+						"id": "bool2231267043",
+						"name": "disabled",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "bool"
+					},
+					{
+						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
 						"onCreate": true,
